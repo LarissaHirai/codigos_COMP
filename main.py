@@ -1,7 +1,8 @@
 from lex import Lex
 import rules
 
-content = '52132 + )23(())))) - x * 3'
+f = open(r'teste-erro.c')
+content = f.read()
 
 print('parsing content')
 print (content)
