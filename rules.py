@@ -27,6 +27,6 @@ class IdRule(RuleInterface):
     
 class SymbolRule(RuleInterface):
     def regex_rules(self) -> list[str]:
-        return ['\\{', '\\}', '\\(', '\\)', '\\+', '-', '\\*', '/']
+        return ['\\{', '\\}', '\\(', '\\)', '\\+', '-', '\\*', '/','\\#','\\<','\\>','\\.','\\"','\\!','\\;']
     def extract_token(self, match: str) -> Token:
         return Token(TokenClass.SYMBOL, match)
