@@ -2,6 +2,9 @@
 #include <stdio.h>
 
 void main(){
-    printf("Hello world!");
-    return 0;
+    int count;
+    count = 0;
+    for (int i=0; i = 2; i++){
+        count = count + 1;
+    }
 }
