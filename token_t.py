@@ -1,24 +1,23 @@
-# Importação do módulo Enum do pacote enum
+# Importação da classe Enum do módulo enum
 from enum import Enum
 
-# Definição de uma classe Enum chamada TokenClass
+# Definição da classe TokenClass que herda de Enum
 class TokenClass(Enum):
-    # Definição dos membros da enumeração TokenClass
-    NUMERICAL_CONSTANT = 1,
-    ID = 2,
-    SYMBOL = 3,
-    PALAVRA_RESERVADA = 4,
-    COMENT = 5
+    # Definição dos membros da enumeração TokenClass com seus valores
+    NUMERICAL_CONSTANT = 1,  # Constante numérica
+    ID = 2,                   # Identificador
+    SYMBOL = 3,               # Símbolo
+    RESERVED = 4              # Palavra reservada
 
-# Definição de uma classe Token
+# Definição da classe Token
 class Token:
     # Método de inicialização da classe Token
     def __init__(self, token_class: TokenClass, token_value):
-        # Atribuição do valor do parâmetro token_class ao atributo token_class da instância
+        # Atribuição da classe do token ao atributo token_class
         self.token_class = token_class
-        # Atribuição do valor do parâmetro token_value ao atributo token_value da instância
+        # Atribuição do valor do token ao atributo token_value
         self.token_value = token_value
-    # Método para representação da instância como string
+    # Método para representar a instância como uma string
     def __str__(self) -> str:
         # Retorna uma string representando a instância
-        return f'<Token class: {self.token_class}, Value: {self.token_value}>'
+        return f'<Token class: {self.token_class}, value: {self.token_value} >'

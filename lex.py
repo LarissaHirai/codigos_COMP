@@ -1,4 +1,4 @@
-# Importação do módulo rules (módulo que contém as regras de análise léxica)
+# Importação do módulo rules (contendo as regras de análise léxica)
 import rules
 # Importação da classe Token do módulo token_t
 from token_t import Token
@@ -16,7 +16,7 @@ class Lex:
     def next(self) -> Token:
         # Verifica se o conteúdo a ser analisado está vazio
         if not self.content:
-            # Se estiver vazio, retorna None
+            # Se estiver vazio, retorna None, indicando o fim da análise léxica
             return None
 
         # Itera sobre as regras de análise léxica
@@ -24,7 +24,7 @@ class Lex:
             # Verifica se há correspondência com a regra atual
             match = rule.check_match(self.content)
             # Imprime a regra que está sendo testada e o resultado da correspondência
-            print(f'Matching Rule {rule.__class__.__name__}: {match}')
+            print(f'matching rule {rule.__class__.__name__}: {match}')
 
             # Se não houver correspondência, passa para a próxima regra
             if not match:
