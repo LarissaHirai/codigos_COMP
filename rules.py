@@ -54,7 +54,16 @@ class ReservedRule(RuleInterface):
 class SymbolRule(RuleInterface):
     # Método para retornar as regras de expressões regulares para símbolos
     def regex_rules(self) -> list[str]:
-        return ['\\{', '\\}', '\\(', '\\)', '\\+', '-', '\\*', '/','\\#','\\<','\\>','\\.','\\"','\\!','\\;', "\\'", "\\="]
+        return ['\\{', '\\}', '\\(', '\\)', '\\+', '-', '\\*', '/','\\#','\\<','\\>','\\.','\\"','\\!','\\;', "\\'", "\\=",'\\?']
     # Método para extrair um token de uma correspondência de regra de símbolo
     def extract_token(self, match: str) -> Token:
         return Token(TokenClass.SYMBOL, match)
+    
+class CommentaryRule(RuleInterface):
+    # Método para retornar as regras de expressões regulares para comentários
+    def regex_rules(self) -> list[str]:
+        return ['[/*][a-zA-Z0-9_\\{\\}\\(\\)\\+\\-\\*\\/\\#\\<\\>\\.\\"\\\\!\\;\\=\\? ]*[*/]']
+    # Método para extrair um token de uma correspondência de regra de comentário
+    def extract_token(self, match: str) -> Token:
+        return Token(TokenClass.COMMENTARY, match)
+

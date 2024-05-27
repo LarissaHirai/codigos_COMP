@@ -20,6 +20,7 @@ print('\n\n')
 # As regras são passadas como uma lista, onde cada regra é inicializada e adicionada à lista dentro de colchetes
 # As barras invertidas (\) são usadas para indicar a continuação da linha
 lex = Lex(content, [
+    rules.CommentaryRule(),      # Regra para comentários
     rules.NumberConstantRule(),  # Regra para constantes numéricas
     rules.SymbolRule(),          # Regra para símbolos
     rules.ReservedRule(),        # Regra para palavras reservadas

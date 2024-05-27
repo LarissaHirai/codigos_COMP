@@ -4,10 +4,12 @@ from enum import Enum
 # Definição da classe TokenClass que herda de Enum
 class TokenClass(Enum):
     # Definição dos membros da enumeração TokenClass com seus valores
-    NUMERICAL_CONSTANT = 1,  # Constante numérica
-    ID = 2,                   # Identificador
-    SYMBOL = 3,               # Símbolo
-    RESERVED = 4              # Palavra reservada
+    COMMENTARY = 1,          # Comentário
+    NUMERICAL_CONSTANT = 2,  # Constante numérica
+    ID = 3,                   # Identificador
+    SYMBOL = 4,               # Símbolo
+    RESERVED = 5            # Palavra reservada
+       
 
 # Definição da classe Token
 class Token:
