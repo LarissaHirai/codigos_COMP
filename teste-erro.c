@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 void main(){
-    /* Commentado teste 123 ! ? */
+    /* Comentado teste 123 ! ? */
     
     int count;
     count = 0;

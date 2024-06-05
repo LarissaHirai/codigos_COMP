@@ -68,9 +68,6 @@ class Parser:
             statement_node = TreeNode(("STATEMENT", None))
             parent_node.add_child(statement_node)
             self.statement(statement_node)
-            # Verifica se há mais tokens após a análise do statement
-            if self.current_token is None:
-                break
         print("Análise de statement_list concluída")
 
 
