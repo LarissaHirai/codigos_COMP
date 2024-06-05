@@ -5,10 +5,11 @@ from enum import Enum
 class TokenClass(Enum):
     # Definição dos membros da enumeração TokenClass com seus valores
     COMMENTARY = 1,          # Comentário
-    NUMERICAL_CONSTANT = 2,  # Constante numérica
-    ID = 3,                   # Identificador
-    SYMBOL = 4,               # Símbolo
-    RESERVED = 5            # Palavra reservada
+    IMPORTS = 2,
+    NUMERICAL_CONSTANT = 3,  # Constante numérica
+    ID = 4,                   # Identificador
+    SYMBOL = 5,               # Símbolo
+    RESERVED = 6           # Palavra reservada
        
 
 # Definição da classe Token

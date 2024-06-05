@@ -23,8 +23,8 @@ class Lex:
         for rule in self.rules:
             # Verifica se há correspondência com a regra atual
             match = rule.check_match(self.content)
-            # Imprime a regra que está sendo testada e o resultado da correspondência
-            print(f'matching rule {rule.__class__.__name__}: {match}')
+           
+           
 
             # Se não houver correspondência, passa para a próxima regra
             if not match:

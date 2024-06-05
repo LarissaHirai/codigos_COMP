@@ -66,4 +66,13 @@ class CommentaryRule(RuleInterface):
     # Método para extrair um token de uma correspondência de regra de comentário
     def extract_token(self, match: str) -> Token:
         return Token(TokenClass.COMMENTARY, match)
+    
+class ImportsRule(RuleInterface):
+    
+    def regex_rules(self) -> list[str]:
+        return [r'#include\s*<[^>]+>']
+    def extract_token(self, match: str) -> Token:
+        return Token(TokenClass.IMPORTS, match)
+    
+
 

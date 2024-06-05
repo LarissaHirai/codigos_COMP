@@ -1,0 +1,6 @@
+// Árvore Sintática
+digraph {
+	2124852531600 [label="PROGRAM: None"]
+	2125124370208 [label="STATEMENT_LIST: None"]
+	2124852531600 -> 2125124370208
+}

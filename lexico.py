@@ -1,7 +1,13 @@
 # Importação da classe Lex do módulo lex
 from lex import Lex
+
+from token_t import TokenClass
 # Importação do módulo rules (que contém as regras de análise léxica)
 import rules
+import numpy as np
+
+
+
 
 # Abertura do arquivo 'teste-erro.c' em modo de leitura
 f = open(r'teste-erro.c')
@@ -20,6 +26,7 @@ print('\n\n')
 # As regras são passadas como uma lista, onde cada regra é inicializada e adicionada à lista dentro de colchetes
 # As barras invertidas (\) são usadas para indicar a continuação da linha
 lex = Lex(content, [
+    rules.ImportsRule(),
     rules.CommentaryRule(),      # Regra para comentários
     rules.NumberConstantRule(),  # Regra para constantes numéricas
     rules.SymbolRule(),          # Regra para símbolos
@@ -27,12 +34,22 @@ lex = Lex(content, [
     rules.IdRule() ])               # Regra para identificadores
 
 # Loop infinito para extrair tokens até que não haja mais tokens a serem extraídos
-while True:
-    # Obtém o próximo token da análise léxica
-    token_atual = lex.next()
-    # Verifica se o token atual é None, indicando o fim da análise léxica
-    if token_atual is None:
-        # Se for None, sai do loop
-        break
-    # Impressão do token extraído
-    print(f'\nToken extraido: {token_atual}\n')
+def main():
+    codigo = np.empty([0,2]) #Armazenará o código
+    while True:
+        # Obtém o próximo token da análise léxica
+        token_atual = lex.next()
+        # Verifica se o token atual é None, indicando o fim da análise léxica
+        if token_atual is None:
+            # Se for None, sai do loop
+            break
+        # Impressão do token extraído
+        
+        if(token_atual.token_class != TokenClass.COMMENTARY):
+            codigoAdd = np.array([token_atual.token_class.name,token_atual.token_value])
+            codigo = np.vstack((codigo,codigoAdd))
+            
+
+    return codigo
+
+main()
