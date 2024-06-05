@@ -1,7 +1,7 @@
 from lexico import main as lexicoMain
 import numpy as np
 from token_t import TokenClass
-from graphviz import Digraph
+#import matplotlib.pyplot as plt
 
 class TreeNode:
     def __init__(self, value):
@@ -41,7 +41,11 @@ class Parser:
         if self.current_token is not None and self.current_token[0] == expected_class:
             self.advance()
         else:
-            raise SyntaxError(f"Esperado token {expected_class}, mas encontrou {self.current_token}")
+            if self.current_token is not None:
+                raise SyntaxError(f"Esperado token {expected_class}, mas encontrou {self.current_token}")
+            else:
+                print("Fim dos tokens")
+
 
     def parse(self):
         """ Inicia a análise sintática """
@@ -51,9 +55,11 @@ class Parser:
     def program(self, parent_node):
         """ Regra: Program -> StatementList """
         print("Iniciando análise: Program")
+        print("Chamando statement_list na função program")
         statement_list_node = TreeNode(("STATEMENT_LIST", None))
         parent_node.add_child(statement_list_node)
         self.statement_list(statement_list_node)
+        print("Análise de statement_list concluída na função program")
 
     def statement_list(self, parent_node):
         """ Regra: StatementList -> Statement StatementList | ε """
@@ -62,20 +68,32 @@ class Parser:
             statement_node = TreeNode(("STATEMENT", None))
             parent_node.add_child(statement_node)
             self.statement(statement_node)
+            # Verifica se há mais tokens após a análise do statement
+            if self.current_token is None:
+                break
+        print("Análise de statement_list concluída")
+
 
     def statement(self, parent_node):
         """ Regra: Statement -> Imports | Assignment | Declaration | ForLoop | OtherStatements """
         print("Analisando: Statement")
+        print("Token atual:", self.current_token)
         if self.current_token[0] == 'IMPORTS':
+            print("Chamando imports")
             self.imports(parent_node)
         elif self.current_token[0] == 'ID':
+            print("Chamando assignment")
             self.assignment(parent_node)
         elif self.current_token[0] == 'RESERVED' and self.current_token[1] == 'int':
+            print("Chamando declaration")
             self.declaration(parent_node)
         elif self.current_token[0] == 'RESERVED' and self.current_token[1] == 'for':
+            print("Chamando for_loop")
             self.for_loop(parent_node)
         else:
+            print("Chamando other_statements")
             self.other_statements(parent_node)
+        print("Token atual após statement:", self.current_token)
 
     def imports(self, parent_node):
         """ Regra: Imports -> #include <filename> """
@@ -83,6 +101,7 @@ class Parser:
         imports_node = TreeNode(("IMPORTS", self.current_token[1]))
         parent_node.add_child(imports_node)
         self.consume('IMPORTS')
+        print("Token atual após imports:", self.current_token)
 
     def assignment(self, parent_node):
         """ Regra: Assignment -> id = Expression ; """
@@ -95,35 +114,49 @@ class Parser:
         self.consume('SYMBOL')  # Consuming '='
         self.expression(assignment_node)
         self.consume('SYMBOL')  # Consuming ';'
+        print("Token atual após assignment:", self.current_token)
+
 
     def declaration(self, parent_node):
-        """ Regra: Declaration -> type id ; """
+        """ Regra: Declaration -> type id = Expression ; """
         print("Analisando: Declaration")
         declaration_node = TreeNode(("DECLARATION", None))
         parent_node.add_child(declaration_node)
-        self.consume('RESERVED')
+        self.consume('RESERVED')  # Consome 'int'
         id_node = TreeNode(("ID", self.current_token[1]))
         declaration_node.add_child(id_node)
         self.consume('ID')
-        self.consume('SYMBOL')  # Consuming ';'
+        if self.current_token is not None and self.current_token[0] == 'SYMBOL' and self.current_token[1] == '=':
+            self.consume('SYMBOL')  # Consome '='
+            self.expression(declaration_node)
+        self.consume('SYMBOL')  # Consome ';'
 
     def for_loop(self, parent_node):
-        """ Regra: ForLoop -> for (Assignment; Condition; Assignment) { StatementList } """
+        """ Regra: ForLoop -> for (Declaration; Condition; Assignment) { StatementList } """
         print("Analisando: ForLoop")
         for_loop_node = TreeNode(("FOR_LOOP", None))
         parent_node.add_child(for_loop_node)
-        self.consume('RESERVED')
-        self.consume('SYMBOL')
-        self.assignment(for_loop_node)
+        self.consume('RESERVED')  # Consome 'for'
+        self.consume('SYMBOL')  # Consome '('
+
+        # Verifica se é uma declaração de variável dentro do for
+        if self.current_token[0] == 'RESERVED' and self.current_token[1] == 'int':
+            self.declaration(for_loop_node)
+        else:
+            self.assignment(for_loop_node)
+
+        # Aqui não consome ';' porque já é consumido na declaração ou atribuição
+
         self.condition(for_loop_node)
-        self.consume('SYMBOL')
+        self.consume('SYMBOL')  # Consome ';'
         self.assignment(for_loop_node)
-        self.consume('SYMBOL')
-        self.consume('SYMBOL')
+        self.consume('SYMBOL')  # Consome ')'
+        self.consume('SYMBOL')  # Consome '{'
         statement_list_node = TreeNode(("STATEMENT_LIST", None))
         for_loop_node.add_child(statement_list_node)
         self.statement_list(statement_list_node)
-        self.consume('SYMBOL')
+        self.consume('SYMBOL')  # Consome '}'
+
 
     def condition(self, parent_node):
         """ Regra: Condition -> Expression ComparisonOperator Expression """
@@ -133,6 +166,7 @@ class Parser:
         self.expression(condition_node)
         self.consume('SYMBOL')  # Simplificação para exemplo
         self.expression(condition_node)
+        print("Token atual após condition:", self.current_token)
 
     def other_statements(self, parent_node):
         """ Placeholder para outras declarações que não estão cobertas pelas regras básicas """
@@ -140,49 +174,53 @@ class Parser:
         other_statements_node = TreeNode(("OTHER_STATEMENTS", self.current_token[1]))
         parent_node.add_child(other_statements_node)
         self.advance()
+        print("Token atual após other_statements:", self.current_token)
 
     def expression(self, parent_node):
-        """ Regra: Expression -> id | number """
+        """ Regra: Expression -> id | number | ε """
         print("Analisando: Expression")
         expression_node = TreeNode(("EXPRESSION", None))
         parent_node.add_child(expression_node)
+        if self.current_token is None:
+            print("Expressão vazia")
+            return
         if self.current_token[0] == 'ID':
             id_node = TreeNode(("ID", self.current_token[1]))
             expression_node.add_child(id_node)
             self.consume('ID')
-        elif self.current_token[0] == 'NUMBER':
+        elif self.current_token[0] == 'NUMERICAL_CONSTANT':
             number_node = TreeNode(("NUMBER", self.current_token[1]))
             expression_node.add_child(number_node)
-            self.consume('NUMBER')
+            self.consume('NUMERICAL_CONSTANT')
         else:
-            raise SyntaxError(f"Esperado 'ID' ou 'NUMBER', mas encontrou {self.current_token}")
+            print("Expressão vazia")
+            return  # Permitir expressão vazia
+        print("Token atual após expression:", self.current_token)
 
-    def print_syntax_tree(self, filename="syntax_tree"):
-        """Imprime a árvore sintática final em um arquivo de imagem."""
-        if self.syntax_tree:
-            dot = Digraph(comment="Árvore Sintática")
-            self._build_graph(dot, self.syntax_tree)
-            dot.render(filename, format="png", cleanup=True)
-            print(f"Árvore sintática impressa em '{filename}.png'")
-        else:
-            print("A análise sintática ainda não foi realizada.")
 
-    def _build_graph(self, dot, node):
-        """Recursivamente constrói a árvore para impressão."""
+
+    def print_syntax_tree(self, node=None, indent=0):
+        """Imprime a árvore sintática final."""
+        if node is None:
+            node  = self.syntax_tree
+        print("Árvore Sintática:")
+        self._print_syntax_tree_recursive(node, indent)
+
+    def _print_syntax_tree_recursive(self, node, indent):
+        """Método auxiliar para imprimir a árvore sintática final de forma recursiva."""
         if node:
-            dot.node(str(id(node)), str(node.value[0]) + ": " + str(node.value[1]))
+            print("  " * indent + str(node.value[0]) + ": " + str(node.value[1]))
             for child in node.children:
-                child_id = id(child)
-                self._build_graph(dot, child)
-                dot.edge(str(id(node)), str(child_id))
+                self._print_syntax_tree_recursive(child, indent + 1)
+
 
 def main():
     tokens = lexicoMain()
     parser = Parser(tokens)
     try:
         parser.parse()
-        parser.print_syntax_tree()
         print("Análise sintática concluída com sucesso!")
+        
     except SyntaxError as e:
         print(f"Erro de sintaxe: {e}")
 

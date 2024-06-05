@@ -49,7 +49,6 @@ def main():
             codigoAdd = np.array([token_atual.token_class.name,token_atual.token_value])
             codigo = np.vstack((codigo,codigoAdd))
             
-
+    print("Tokens: ",codigo)
     return codigo
 
-main()
