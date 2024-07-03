@@ -310,7 +310,9 @@ class Parser:
     def generate_machine_code(self):
         machine_code = []
         self.traverse_and_generate(self.syntax_tree, machine_code)
-        return machine_code
+        with open('teste.txt', 'r') as file:
+            conteudo = file.readlines()
+        return machine_code, conteudo
 
     def traverse_and_generate(self, node, machine_code):
         if node.value[0] == "PROGRAM":
@@ -404,8 +406,8 @@ def main():
         parser.parse()
         print("Análise sintática e semântica concluída com sucesso!")
         parser.print_syntax_tree()
-        codigo=parser.generate_machine_code()
-        print("codigo", codigo)
+        codigo, codigo2=parser.generate_machine_code()
+        print("codigo", codigo2)
 
     except (SyntaxError, SemanticError) as e:
         print(f"Erro: {e}")

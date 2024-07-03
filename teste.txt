@@ -1,0 +1,29 @@
+.section .data
+.section .text
+.globl main
+
+main:
+    # Comentado teste 123 ! ?
+    
+    # Initialize the count variable
+    movl $0, %eax
+    movl %eax, count(%rip)
+
+    # Loop to increment the count variable
+    movl $0, %ecx
+    loop:
+        movl count(%rip), %eax
+        addl $1, %eax
+        movl %eax, count(%rip)
+        incl %ecx
+        cmpl $2, %ecx
+        jl loop
+
+    # Exit the program
+    movl $0, %eax
+    movl $60, %eax
+    syscall
+
+.data
+count:
+    .int 0
