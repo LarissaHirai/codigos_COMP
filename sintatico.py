@@ -217,6 +217,7 @@ def main():
     try:
         parser.parse()
         print("Análise sintática concluída com sucesso!")
+        parser.print_syntax_tree()
         
     except SyntaxError as e:
         print(f"Erro de sintaxe: {e}")

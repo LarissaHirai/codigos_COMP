@@ -172,6 +172,8 @@ class Parser:
         self.consume('SYMBOL')  # Consuming '=' or '+-'
         if self.current_token[0]=='SYMBOL':
             print("Aqui")
+            id_node = TreeNode(("SYMBOL", self.current_token[1]))
+            assignment_node.add_child(id_node)
             self.consume('SYMBOL') # Consuming '+-'
         else: 
             print("Aqui2")
@@ -378,7 +380,6 @@ class Parser:
         elif node.value[0] == "NUMBER":
             machine_code.append(node.value[1])  # Adicionar o número ao código de máquina
         else:
-            print("AQUIASDASJ")
             if node.value[1] is not None:
                 if node.value[1] == "=":
                     machine_code.append("STORE")  # Atribuição
