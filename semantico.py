@@ -172,7 +172,7 @@ class Parser:
         self.consume('SYMBOL')  # Consuming '=' or '+-'
         if self.current_token[0]=='SYMBOL':
             print("Aqui")
-            id_node = TreeNode(("SYMBOL", self.current_token[1]))
+            id_node = TreeNode(("incl", self.current_token[1]))
             assignment_node.add_child(id_node)
             self.consume('SYMBOL') # Consuming '+-'
         else: 
@@ -242,7 +242,7 @@ class Parser:
         expr_type_left = self.expression(condition_node)
         
         if self.current_token is not None and self.current_token[0] in ['SYMBOL', 'RESERVED']:
-            comparison_op_node = TreeNode(("COMPARISON_OPERATOR", self.current_token[1]))
+            comparison_op_node = TreeNode(("cmpl", self.current_token[1]))
             condition_node.add_child(comparison_op_node)
             self.consume(self.current_token[0])
         else:
@@ -310,42 +310,36 @@ class Parser:
     def generate_machine_code(self):
         machine_code = []
         self.traverse_and_generate(self.syntax_tree, machine_code)
-        with open('teste.txt', 'r') as file:
-            conteudo = file.readlines()
-        return machine_code, conteudo
+        return machine_code
 
     def traverse_and_generate(self, node, machine_code):
         if node.value[0] == "PROGRAM":
             for child in node.children:
                 self.traverse_and_generate(child, machine_code)
         elif node.value[0] == "IMPORTS":
-            import_statement = f"IMPORT {node.value[1]}"
+            import_statement = f".section .data"
             machine_code.append(import_statement)
         elif node.value[0] == "FUNCTION_DECLARATION":
             func_name = node.children[0].value[1]
-            machine_code.append(f"DECLARE FUNCTION {func_name}")
+            machine_code.append(f".globl {func_name}")
             if len(node.children) > 1:
                 self.traverse_and_generate(node.children[1], machine_code)
         elif node.value[0] == "ASSIGNMENT":
             var_name = node.children[0].value[1]
             if len(node.children) > 1:
                 self.traverse_expression(node.children[1], machine_code)
-                machine_code.append(f"STORE {var_name}")
+                machine_code.append(f"movl {var_name}")
         elif node.value[0] == "DECLARATION":
             var_name = node.children[0].value[1]
             var_type = node.value[1]
             if len(node.children) > 1:
                 self.traverse_expression(node.children[1], machine_code)
-                machine_code.append(f"STORE {var_name}")
+                machine_code.append(f"movl {var_name}")
         elif node.value[0] == "FOR_LOOP":
-            if len(node.children) > 0:
-                self.traverse_and_generate(node.children[0], machine_code)  # Declaração ou Atribuição inicial
-            if len(node.children) > 1:
-                self.traverse_and_generate(node.children[1], machine_code)  # Condição
-            if len(node.children) > 2:
-                self.traverse_and_generate(node.children[2], machine_code)  # Atribuição
-            if len(node.children) > 3:
-                self.traverse_and_generate(node.children[3], machine_code)  # Lista de instruções dentro do for
+            machine_code.append(f"loop:")
+            for child in node.children:
+                self.traverse_and_generate(child, machine_code)
+            machine_code.append(f"jl loop")
         elif node.value[0] == "STATEMENT":
             for child in node.children:
                 self.traverse_and_generate(child, machine_code)
@@ -355,11 +349,11 @@ class Parser:
         elif node.value[0] == "OTHER_STATEMENTS":
             statement_type = node.value[1]
             if statement_type == ';':
-                machine_code.append("NOP")  # Comando vazio
+                machine_code.append("")  # Comando vazio
             elif statement_type == '{':
-                machine_code.append("BEGIN_BLOCK")  # Início de bloco
+                machine_code.append(".section")  # Início de bloco
             elif statement_type == '}':
-                machine_code.append("END_BLOCK")  # Fim de bloco
+                machine_code.append(".data")  # Fim de bloco
         elif node.value[0] == "CONDITION":
             self.traverse_and_generate(node.children[0], machine_code)  # Primeira expressão
             machine_code.append(node.children[1].value[0])  # Operador de comparação
@@ -374,28 +368,28 @@ class Parser:
     def traverse_expression(self, node, machine_code):
         if node.value[0] == "EXPRESSION":
             for child in node.children:
-                self.traverse_expression(child, machine_code)  # Lidar com cada child da expressão
+                self.traverse_expression(child, machine_code)  
             if node.value[1] is not None:
-                machine_code.append(node.value[1])  # Adicionar operador ou tipo de expressão
+                machine_code.append(node.value[1])  
         elif node.value[0] == "ID":
-            machine_code.append(f"LOAD {node.value[1]}")  # Carregar variável
+            machine_code.append(f"movl {node.value[1]}")  
         elif node.value[0] == "NUMBER":
-            machine_code.append(node.value[1])  # Adicionar o número ao código de máquina
+            machine_code.append(node.value[1])  
         else:
             if node.value[1] is not None:
                 if node.value[1] == "=":
-                    machine_code.append("STORE")  # Atribuição
+                    machine_code.append("movl") 
                 elif node.value[1] == "+":
-                    machine_code.append("ADD")  # Adição
+                    machine_code.append("addl")  
                 elif node.value[1] == "-":
-                    machine_code.append("SUB")  # Subtração
+                    machine_code.append("subl")  
                 elif node.value[1] == "*":
-                    machine_code.append("MUL")  # Multiplicação
+                    machine_code.append("mull")  
                 elif node.value[1] == "/":
-                    machine_code.append("DIV")  # Divisão
+                    machine_code.append("divl")  
                 else:
                     machine_code.append(node.value[1])
-            machine_code.append(node.value[0])  # Adicionar operador ao código de máquina
+            machine_code.append(node.value[0])  
         
 
 
@@ -405,9 +399,8 @@ def main():
     try:
         parser.parse()
         print("Análise sintática e semântica concluída com sucesso!")
-        parser.print_syntax_tree()
-        codigo, codigo2=parser.generate_machine_code()
-        print("codigo", codigo2)
+        codigo=parser.generate_machine_code()
+        print("codigo", codigo)
 
     except (SyntaxError, SemanticError) as e:
         print(f"Erro: {e}")

@@ -3,26 +3,23 @@
 .globl main
 
 main:
-    # Comentado teste 123 ! ?
     
-    # Initialize the count variable
-    movl $0, %eax
-    movl %eax, count(%rip)
+    
+    
+    movl 0, 
+    movl count
 
-    # Loop to increment the count variable
-    movl $0, %ecx
+    
+    movl 0, i
     loop:
-        movl count(%rip), %eax
-        addl $1, %eax
-        movl %eax, count(%rip)
-        incl %ecx
-        cmpl $2, %ecx
+        movl count, 
+        addl 1, 
+        movl , count
+        incl i
+        cmpl 2, i
         jl loop
 
-    # Exit the program
-    movl $0, %eax
-    movl $60, %eax
-    syscall
+
 
 .data
 count:
